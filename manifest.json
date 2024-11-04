@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "Bing View Toggle",
+    "version": "1.0",
+    "description": "Toggle between show and hide views on bing.com",
+    "permissions": ["activeTab"],
+    "host_permissions": ["https://www.bing.com/*"],
+    "action": {
+      "default_title": "Toggle View"
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://www.bing.com/*"],
+        "js": ["content.js"]
+      }
+    ]
+  }
