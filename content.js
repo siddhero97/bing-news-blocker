@@ -1,32 +1,47 @@
-// Function to toggle between show and hide classes
-function toggleView() {
-    // Find all elements with the specific class pattern
+// Function to set view state
+function setViewState(showNews) {
+    console.log(`setViewState called with showGrid: ${showNews}`);
+
     const elements = document.querySelectorAll('[class*="module"][class*="five_col"][class*="feed_bg"]');
+    console.log(`Found ${elements.length} elements to update`);
     
-    elements.forEach(element => {
+    elements.forEach((element, index) => {
+        console.log(`Processing element ${index + 1}`);
         const classList = element.className.split(' ');
-        // Create new class list
+        console.log(`Original class list: ${classList.join(', ')}`);
+
         const newClassList = classList.map(className => {
-            if (className === 'hide') return 'show';
-            if (className === 'show') return 'hide';
+            if (className === 'hide' || className === 'show') {
+                const newClass = showNews ? 'show' : 'hide';
+                console.log(`Changing class from ${className} to ${newClass}`);
+                return newClass;
+            }
             return className;
         });
-        // Apply new classes
+
         element.className = newClassList.join(' ');
+        console.log(`Updated class list: ${element.className}`);
     });
+    
+    console.log(`View updated: ${showNews ? 'Grid' : 'List'} view`);
 }
 
-// Listen for messages from the background script
+// Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    console.log('Message received:', request);
     if (request.action === 'toggle') {
-        toggleView();
+        console.log(`Toggling view state to: ${request.state}`);
+        setViewState(request.state);
+        console.log('Sending response');
         sendResponse({status: 'completed'});
     }
 });
 
-// Optional: Add keyboard shortcut (Ctrl+Shift+T)
-document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.shiftKey && e.key === 'T') {
-        toggleView();
-    }
+// Load initial state
+console.log('Loading initial state');
+chrome.storage.local.get(['viewState'], function(result) {
+    console.log('Initial viewState:', result.viewState);
+    setViewState(result.viewState || false);
 });
+
+console.log('Content script loaded and initialized');
